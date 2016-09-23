@@ -1,15 +1,17 @@
 #The function returns a vector with a specified number of top SNP selected based on correlation with 
-#the specified number of principal components. It also writes them into a text file that can be read by plink.
+#the specified number of principal components which is determided by performing GWA with the PC as response variables. 
+#When using only one PC, the negative log of the p-value is used for ranking. When correlation with more than PC is preffered,  
+#the sum of the the -log (p-value) of the PC weighted by their eigenvalue is used for ranking (equasion can be found in the readme).
+#The function also writes them into a text file that can be read by plink.
 #It takes the following arguments:
 #1. g: name of the genetype file in plink format (PED/MAP). Only the root name of the file should be specified, and both
 #the .ped and .map files should be in the wrking directory
 #2. tp: an intiger specifying the the number of top SNP to consider 
 #3. ts: an intiger spcifying the number of top SNP to pick 
 #4. simultaneous: this is a logical indicating if simultaneous correlation with top PC (specified by ts) or just the one pc 
-#specified by 'ts' should be used to rank SNP. More details about how the ranking is done when more than one PC is being considered,
-#can be found in the readme file.
-#dependencies: the function makes of PLINK1.9, so make sure plink.exe (foe windows commandline) is in your working directory
-#It helps to know how PLINK works, and how output files are structured to undertand why some parts of this function are the way they are
+#specified by 'ts' should be used to rank SNP. 
+#Dependencies: the function makes use of PLINK1.9, so make sure plink.exe (for windows commandline) is in your working directory
+#It helps to know how PLINK works and how output files are structured to undertand why some parts of this function are the way they are
 
 topsnp<- function (g, tp = 1, ts, simultaneous = F) {
   #perform PCA on data
@@ -29,10 +31,10 @@ topsnp<- function (g, tp = 1, ts, simultaneous = F) {
     } 
     else 
     {
-    #if 'simultaneous' is true Perform GWA for 'ts' number of top PC 
+    #if 'simultaneous' is true Perform GWA for 'ts' number of top PC and put results in a list 
     marker_lists<-lapply(1:tp, function(x) {
     write.table(ev[, c(1, 2, 2+x)], "pheno.txt", row.names = F, col.names = F, 
-                quote = F, sep = " ") # writing a phenotype file to input into plink
+                quote = F, sep = " ") # writing a phenotype ("pheno") file to input into plink
     tname<-paste("asso", x, sep = "") # making a temporary name for plink output file
     system(paste("plink","-cow", "-file", g, "-assoc", "-pheno", "pheno.txt", 
                  "-allow-no-sex", "-out", tname)) #performing GWA with selected PC as a response and putting result in tname
