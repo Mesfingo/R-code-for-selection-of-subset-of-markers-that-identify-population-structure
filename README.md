@@ -2,7 +2,7 @@ The function returns a vector with a specified number of top SNP selected based 
 the specified number of principal components which is determided by performing GWA with the PC as response variable. 
 When using only one PC, the negative log of the p-value is used for ranking. When correlation with more than PC is preffered,  
 the sum of the the -log (p-value) of the PC weighted by their eigenvalue is used for ranking (equation shown below).
-The function also writes them into a text file that can be read by plink.
+The function also writes selected SNP into a text file that can be read by plink.
 
 It takes the following arguments:
 
