@@ -25,6 +25,7 @@ topsnp<- function (g, tp = 1, ts, simultaneous = F) {
     system(paste("plink","-cow", "-file", "250k", "-assoc", "-pheno", "pheno.txt", 
                  "-allow-no-sex", "-out", tname)) #performing GWA with selected PC as a response and putting result in tname
     p<- read.table(paste(tname, ".qassoc", sep = ""), header = T)[,c(2,9)] # reading relevant parts of GWA result (SNP id & p-values) 
+    p[, 2]<- log10(p[, 2]) * (-1)  #converting p-values into -logs
     } 
     else 
     {
@@ -37,17 +38,16 @@ topsnp<- function (g, tp = 1, ts, simultaneous = F) {
                  "-allow-no-sex", "-out", tname)) #performing GWA with selected PC as a response and putting result in tname
     return(read.table(paste(tname, ".qassoc", sep = ""), header = T)[,c(2,9)]) # relevant parts of GWA result (SNP id & p-values) 
       })
-    p<-as.data.frame(marker_lists) #changing to dataframe
-    if(ncol(p)>2) {p<-p[,-(seq(3, ncol(p), by = 2))]} #get rid of redundant columns (snp IDs)
+    p<- as.data.frame(marker_lists) #changing to dataframe
+    p<- p[,-(seq(3, ncol(p), by = 2))] #get rid of redundant columns (snp IDs)
+    p[, 2:(tp+1)]<- log10(p[,2:(tp+1)]) * (-1) #change raw p-values into -logs
     }
     
-   p[, 2:(tp+1)]<- log10(p[,2:(tp+1)])*-1   #change raw p-values into -logs
-   
    #if 'simultaneous' is false, use the top 'ts' PC only and calculate linnear combination of -log(p) and eigenvalues. else use -log(p-val) for 1 PC only
    if (simultaneous)
    {
    y<- sapply(1:nrow(p), function (x) {  
-   sum((p[x, 2:(tp + 1)]) * eva[,1][1:tp]) #more on this can be found in the readme file
+   sum((p[x, 2:(tp + 1)]) * eva[,1][1:tp])
    })   # make 'y', a value to rank SNP based on -log(p-val) weighted by eigenvalue (eva) for corresponding PC
    p<- data.frame(p[,1], y)   #z is a data frame with marker names and their associated y value  
    }
@@ -55,7 +55,7 @@ topsnp<- function (g, tp = 1, ts, simultaneous = F) {
    p<- p[order(p[,2], decreasing = T), ] #reordering 'p' based on values of y which is the p-value derivation
    
   
-  topsnp<- p[1:ts, 1]    # extract 'ts' amount of top SNP 
+  topsnp<- p[1:ts, 1]    # extract 'ts' amount of top SNP ranked based on y
   write.table(topsnp, file = "topsnp.txt", 
               row.names = F, col.names = F, sep = " ", quote = F)   #write top selected markers into a file for plink to read
   
