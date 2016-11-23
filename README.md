@@ -1,3 +1,5 @@
+**update** The function described here can be replaced by the compact and much more efficient code described in another 
+           repository in this assount (). 
 The function returns a vector with a specified number of top SNP selected based on correlation with 
 the specified number of principal components which is determided by performing GWA with the PC as response variable. 
 When using only one PC, the negative log of the p-value is used for ranking. When correlation with more than PC is preffered,  
