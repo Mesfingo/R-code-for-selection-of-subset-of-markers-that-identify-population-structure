@@ -1,4 +1,4 @@
-**update** The function described here can be replaced by the compact and much more efficient code described in another 
+**Update** The function described here can/should be replaced by the compact and much more efficient code described in another 
            repository in this assount (R-code-for-identifying-PCA-correlated-SNP-for-population-structure-identification). 
            
 The function returns a vector with a specified number of top SNP selected based on correlation with 
